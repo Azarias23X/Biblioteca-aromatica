@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Perfumes - Biblioteca Olfativa</title>
+    <style>
+      *, *::before, *::after { box-sizing: border-box; }
+      html, body { width: 100%; max-width: 100%; overflow-x: hidden; }
+      body{
+        font-family: Arial, sans-serif;
+        margin:0; padding:0;
+        background:#f9f9f9;
+        display:flex; justify-content:center; align-items:center;
+        min-height:100vh;
+      }
+      .container{
+        width:92%;
+        max-width:920px;
+        background:#fff;
+        border-radius:10px;
+        box-shadow:0 4px 10px rgba(0,0,0,.1);
+        padding:20px;
+        position:relative;
+        overflow:hidden;
+      }
+      h1{
+        text-align:center;
+        color:#333;
+        margin:0 0 18px;
+        padding:0 36px;
+        line-height:1.2;
+      }
+      .back-button{
+        position:absolute;
+        top:12px; left:12px;
+        background:transparent;
+        color:#007bff;
+        border:none;
+        cursor:pointer;
+        font-size:1.35rem;
+        padding:6px 10px;
+        border-radius:10px;
+      }
+      .back-button:hover{ color:#0056b3; background:#f3f4f6; }
+      .card{
+        background:#fff;
+        border:1px solid #eee;
+        border-radius:14px;
+        padding:14px;
+        margin-bottom:14px;
+        box-shadow:0 6px 16px rgba(0,0,0,.06);
+      }
+      .row{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+      }
+      input{
+        padding:10px;
+        border:1px solid #ccc;
+        border-radius:12px;
+        font-size:1rem;
+        width:100%;
+      }
+      .tool-btn{
+        padding:10px 12px;
+        border:none;
+        border-radius:12px;
+        cursor:pointer;
+        font-size:1rem;
+        color:#fff;
+        background:#111;
+        white-space:nowrap;
+      }
+      .tool-btn.primary{ background:#007BFF; }
+      .tool-btn.danger{ background:#dc3545; }
+      .tool-btn.secondary{ background:#111; }
+      .tool-btn:hover{ opacity:.92; }
+      .label{
+        font-size:.95rem;
+        color:#333;
+        font-weight:700;
+        margin-bottom:8px;
+        text-align:left;
+      }
+      .stock-text-available{ color:#111; }
+      .stock-text-low{ color:#D68F00; }
+      .stock-text-out{ color:#DC2626; }
+      .suggest-wrap{ position:relative; width:100%; }
+      .suggest-list{
+        position:absolute;
+        left:0; right:0;
+        top:calc(100% + 6px);
+        background:#fff;
+        border:1px solid #ddd;
+        border-radius:12px;
+        box-shadow:0 10px 30px rgba(0,0,0,.12);
+        z-index:1200;
+        max-height:260px;
+        overflow:auto;
+        display:none;
+      }
+      .suggest-list.open{ display:block; }
+      .suggest-item{
+        padding:10px 12px;
+        cursor:pointer;
+        border-bottom:1px solid #f1f1f1;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .suggest-item:last-child{ border-bottom:none; }
+      .suggest-item:hover{ background:#f6f7f9; }
+      .suggest-empty{ padding:10px 12px; color:#666; font-style:italic; }
+      .selected-list{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        margin-top:10px;
+      }
+      .sel-card{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        padding:12px;
+        border-radius:14px;
+        border:1px solid rgba(0,0,0,.08);
+        background:#f6f7f9;
+        box-shadow:0 6px 16px rgba(0,0,0,.05);
+      }
+      .sel-top{
+        display:flex;
+        gap:10px;
+        align-items:flex-start;
+        justify-content:space-between;
+        flex-wrap:wrap;
+      }
+      .sel-title{
+        min-width:200px;
+        flex:1;
+        display:flex;
+        flex-direction:column;
+        gap:4px;
+      }
+      .sel-title .name{
+        font-weight:800;
+        font-size:.95rem;
+        max-width:100%;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .sel-title .meta{
+        font-weight:600;
+        color:#555;
+        font-size:.85rem;
+        max-width:100%;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .sel-actions{ display:flex; gap:8px; align-items:center; }
+      .icon-btn{
+        border:none;
+        background:transparent;
+        cursor:pointer;
+        font-size:1.25rem;
+        padding:6px 10px;
+        border-radius:10px;
+        line-height:1;
+      }
+      .icon-btn:hover{ background:#eceef1; }
+      .percent-row{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        flex-wrap:wrap;
+      }
+      .percent-row .pct-input{
+        width:92px;
+        padding:8px 10px;
+        border-radius:12px;
+        border:1px solid #cfcfcf;
+        background:#fff;
+        font-weight:800;
+      }
+      .percent-row .pct-label{
+        font-weight:800;
+        color:#111;
+        font-size:.9rem;
+      }
+      .percent-row input[type="range"]{
+        flex:1;
+        min-width:220px;
+        padding:0;
+        border:none;
+        border-radius:0;
+        width:auto;
+      }
+      .sum-row{
+        margin-top:10px;
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        align-items:center;
+        justify-content:space-between;
+      }
+      .sum-pill{
+        display:inline-flex;
+        align-items:center;
+        padding:8px 10px;
+        border-radius:999px;
+        border:1px solid rgba(0,0,0,.08);
+        background:#fff;
+        font-weight:800;
+        font-size:.9rem;
+      }
+      .sum-ok{ color:#065F46; }
+      .sum-bad{ color:#DC2626; }
+      .list-header{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        margin:10px 0;
+        flex-wrap:wrap;
+      }
+      .list-header h2{ margin:0; font-size:1.08rem; }
+      .table-scroll{
+        width:100%;
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+        border-radius:12px;
+      }
+      table{
+        width:100%;
+        border-collapse:collapse;
+        background:#fff;
+        font-size:0.92rem;
+        min-width:520px;
+      }
+      thead{ background:#f5f5f5; }
+      th, td{
+        text-align:left;
+        padding:8px 10px;
+        border:1px solid #ddd;
+        white-space:nowrap;
+        vertical-align:middle;
+      }
+      tr:hover{ background:#f9f9f9; }
+      .name-link{ color:#0d6efd; cursor:pointer; text-decoration:underline; }
+      .name-link:hover{ color:#0a58ca; }
+      .modal-overlay{
+        position:fixed; inset:0;
+        background:rgba(0,0,0,.55);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        padding:16px;
+        z-index:1500;
+      }
+      .modal-overlay.open{ display:flex; }
+      .modal{
+        width:min(760px, 96vw);
+        max-height:90vh;
+        background:#fff;
+        border-radius:14px;
+        box-shadow:0 15px 45px rgba(0,0,0,.25);
+        overflow:hidden;
+        display:flex;
+        flex-direction:column;
+      }
+      .modal-header{
+        display:flex;
+        justify-content:space-between;
+        align-items:flex-start;
+        padding:14px 16px;
+        border-bottom:1px solid #eee;
+        gap:10px;
+      }
+      .modal-title{ margin:0; font-size:1.15rem; color:#111; word-break:break-word; }
+      .modal-close{
+        border:none;
+        background:transparent;
+        font-size:1.6rem;
+        cursor:pointer;
+        line-height:1;
+        padding:6px 10px;
+        border-radius:10px;
+        flex:0 0 auto;
+      }
+      .modal-close:hover{ background:#f3f4f6; }
+      .modal-body{
+        padding:16px;
+        overflow:auto;
+        display:flex;
+        flex-direction:column;
+        gap:12px;
+      }
+      .hint{ color:#666; font-style:italic; font-size:.92rem; }
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        padding:6px 10px;
+        border-radius:999px;
+        border:1px solid rgba(0,0,0,.08);
+        background:#f6f7f9;
+        color:#111;
+        font-weight:800;
+        font-size:0.85rem;
+        white-space:nowrap;
+      }
+      .profile-row{ margin-top:8px; display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+      .profile-badge{
+        border:0;
+        padding:7px 10px;
+        border-radius:999px;
+        font-weight:800;
+        font-size:0.85rem;
+        border:1px solid rgba(0,0,0,.08);
+        cursor:default;
+        user-select:none;
+        max-width:100%;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .ingredients-table{
+        width:100%;
+        border-collapse:collapse;
+        background:#fff;
+        font-size:.92rem;
+        table-layout:fixed;
+      }
+      .ingredients-table th, .ingredients-table td{
+        padding:8px 8px;
+        border:1px solid #eee;
+        vertical-align:middle;
+      }
+      .ingredients-table th{ background:#fafafa; }
+      .ingredients-table th:nth-child(1),
+      .ingredients-table td:nth-child(1){ width:46%; white-space:normal; word-break:break-word; }
+      .ingredients-table th:nth-child(2),
+      .ingredients-table td:nth-child(2){ width:22%; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+      .ingredients-table th:nth-child(3),
+      .ingredients-table td:nth-child(3){ width:26%; white-space:nowrap; }
+      .ingredients-table th:nth-child(4),
+      .ingredients-table td:nth-child(4){ width:6%; text-align:right; }
+      .mini-range{ width:100%; }
+      .mini-input{
+        width:86px;
+        padding:7px 9px;
+        border-radius:10px;
+        border:1px solid #cfcfcf;
+        font-weight:800;
+      }
+      .row-tight{ display:flex; gap:8px; align-items:center; }
+      .modal-tools{
+        display:flex;
+        gap:10px;
+        align-items:center;
+        flex-wrap:wrap;
+        margin-top:8px;
+      }
+      @media (max-width:520px){
+        body{ align-items:flex-start; }
+        .container{ width:100%; max-width:100%; border-radius:0; padding:14px 12px; }
+        h1{ font-size:1.25rem; padding:0 42px; margin-bottom:14px; }
+        .back-button{ top:8px; left:8px; }
+        table{ min-width:560px; }
+        .tool-btn{ width:100%; }
+        .row{ gap:8px; }
+        .percent-row input[type="range"]{ min-width:160px; }
+        .ingredients-table th:nth-child(1), .ingredients-table td:nth-child(1){ width:44%; }
+        .ingredients-table th:nth-child(2), .ingredients-table td:nth-child(2){ width:20%; }
+        .ingredients-table th:nth-child(3), .ingredients-table td:nth-child(3){ width:30%; }
+        .ingredients-table th:nth-child(4), .ingredients-table td:nth-child(4){ width:6%; }
+      }
+    
+      /* ===== Modal: secciones prolijas + Top5 + Detalles técnicos ===== */
+      .modal-section{
+        margin-top:10px;
+        padding:12px;
+        border:1px solid #eee;
+        border-radius:14px;
+        background:#fafafa;
+      }
+      .modal-section-title{
+        font-weight:800;
+        color:#111;
+        font-size:.95rem;
+        margin-bottom:10px;
+      }
+      .tool-btn.small{
+        padding:7px 10px;
+        font-size:.9rem;
+        border-radius:10px;
+      }
+      .top5-wrap{ display:flex; flex-direction:column; gap:10px; }
+      .top5-item{ display:flex; align-items:center; gap:10px; }
+      .top5-name{
+        width:140px;
+        max-width:40%;
+        font-weight:800;
+        font-size:.85rem;
+        color:#111;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      }
+      .top5-bar{
+        flex:1;
+        height:10px;
+        border-radius:999px;
+        background:#e5e7eb;
+        overflow:hidden;
+        border:1px solid rgba(0,0,0,.06);
+      }
+      .top5-fill{ height:100%; width:0%; border-radius:999px; }
+
+      .tech-details{
+        margin-top:10px;
+        border:1px solid #eee;
+        border-radius:14px;
+        overflow:hidden;
+        background:#fff;
+      }
+      .tech-summary{
+        list-style:none;
+        cursor:pointer;
+        padding:12px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:10px;
+        font-weight:800;
+        color:#111;
+        background:#f6f7f9;
+        border-bottom:1px solid #eee;
+        user-select:none;
+      }
+      .tech-summary::-webkit-details-marker{ display:none; }
+      .tech-details[open] .chev{ transform:rotate(180deg); }
+      .chev{ transition:transform .18s ease; }
+
+      .tech-body{ padding:12px; }
+      .tech-grid{
+        display:grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap:10px;
+      }
+      @media (max-width:700px){ .tech-grid{ grid-template-columns:1fr; } }
+
+      .tech-card{
+        border:1px solid #eee;
+        border-radius:14px;
+        padding:12px;
+        background:#fafafa;
+      }
+      .tech-title{ font-weight:800; font-size:.92rem; color:#111; margin-bottom:8px; }
+      .tech-sub{ margin-top:8px; font-size:.85rem; color:#555; font-weight:700; }
+
+      .tech-bar{
+        width:100%;
+        height:10px;
+        border-radius:999px;
+        background:#e5e7eb;
+        overflow:hidden;
+        border:1px solid rgba(0,0,0,.06);
+      }
+      .tech-fill{
+        height:100%;
+        width:0%;
+        border-radius:999px;
+        background:#111;
+      }
+
+      .gender-bar{
+        position:relative;
+        width:100%;
+        height:10px;
+        border-radius:999px;
+        background:#e5e7eb;
+        border:1px solid rgba(0,0,0,.06);
+        overflow:hidden;
+      }
+      .gender-mid{
+        position:absolute;
+        left:50%;
+        top:0;
+        width:2px;
+        height:100%;
+        background:#9ca3af;
+        transform:translateX(-50%);
+      }
+      .gender-marker{
+        position:absolute;
+        top:50%;
+        width:12px;
+        height:12px;
+        border-radius:999px;
+        background:#111;
+        transform:translate(-50%, -50%);
+        left:50%;
+        box-shadow:0 2px 6px rgba(0,0,0,.2);
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Perfumes</h1>
+      <button class="back-button" onclick="window.location.href='index.html';" aria-label="Volver">←</button>
+
+      <div class="card">
+        <div class="label">Nombre del perfume</div>
+        <input id="perfumeName" type="text" placeholder="Ej: Aqua Citrus 01" />
+
+        <div style="height:12px;"></div>
+
+        <div class="label">Agregar ingredientes (desde tu biblioteca)</div>
+        <div class="suggest-wrap">
+          <input id="ingredientSearch" type="text" placeholder="Escribí para buscar ingrediente..." autocomplete="off" />
+          <div id="ingredientSuggest" class="suggest-list"></div>
+        </div>
+
+        <div id="selectedList" class="selected-list"></div>
+
+        <div class="sum-row">
+          <span id="sumPill" class="sum-pill">Total: 0%</span>
+          <div class="row" style="gap:8px;">
+            <button id="normalizeBtn" class="tool-btn secondary" type="button">Normalizar 100%</button>
+          </div>
+        </div>
+
+        <div style="height:12px;"></div>
+        <button id="savePerfumeBtn" class="tool-btn primary" type="button">Guardar perfume</button>
+        <div class="hint" style="margin-top:10px;">
+          Tip: al tocar un perfume en la tabla, vas a ver/editar los ingredientes, sus porcentajes y el perfil olfativo.
+        </div>
+      </div>
+
+      <div class="list-header">
+        <h2>Lista de Perfumes</h2>
+      </div>
+
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Cantidad ingredientes</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="perfumesGrid"></tbody>
+        </table>
+      </div>
+    
+      <div class="card" style="margin-top:14px;">
+        <div class="label">Exportar / Importar</div>
+        <div class="row" style="gap:10px;">
+          <button id="exportJsonBtn" class="tool-btn secondary" type="button">Exportar .JSON</button>
+          <label class="tool-btn secondary" style="display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;">
+            Importar .JSON
+            <input id="importJsonInput" type="file" accept="application/json" style="display:none;" />
+          </label>
+        </div>
+        <div class="hint" style="margin-top:10px;">
+          Exporta/Importa tu biblioteca (ingredientes) y perfumes desde un archivo JSON.
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div class="modal-header">
+          <div>
+            <h3 class="modal-title" id="modalTitle">Detalle</h3>
+            <div class="row" style="gap:8px; flex-wrap:wrap; margin-top:8px;">
+              <button id="openAnalysisBtn" class="tool-btn secondary small" type="button">Ver análisis →</button>
+            </div>
+
+            <div class="modal-tools">
+              <div class="suggest-wrap" style="min-width:260px; flex:1;">
+                <input id="modalIngredientSearch" type="text" placeholder="Agregar ingrediente al perfume..." autocomplete="off" />
+                <div id="modalIngredientSuggest" class="suggest-list"></div>
+              </div>
+              <button id="modalNormalizeBtn" class="tool-btn secondary small" type="button">Normalizar 100%</button>
+              <button id="modalSaveBtn" class="tool-btn primary small" type="button">Guardar cambios</button>
+            </div>
+          </div>
+
+          <button class="modal-close" id="modalClose" type="button" aria-label="Cerrar">×</button>
+        </div>
+
+        <div class="modal-body">
+          <div id="modalMainPanel" class="modal-panel">
+
+          <div id="modalMeta" class="row" style="gap:8px; flex-wrap:wrap;"></div>
+
+          <div class="modal-section">
+            <div class="modal-section-title">Ingredientes usados (editable)</div>
+          <div class="table-scroll" style="border:1px solid #eee; border-radius:12px;">
+            <table class="ingredients-table">
+              <thead>
+                <tr>
+                  <th>Ingrediente</th>
+                  <th>Lugar</th>
+                  <th>%</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="modalIngredients"></tbody>
+            </table>
+          </div>
+
+          <div id="modalSumHint" class="hint"></div>
+
+          </div>
+
+          <div id="modalMissingHint" class="hint" style="display:none;">
+            Algunos ingredientes ya no existen en tu biblioteca (fueron eliminados).
+          </div>
+          </div>
+
+          <div id="modalAnalysisPanel" class="modal-panel" style="display:none;">
+            <div class="row" style="justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+              <div class="label" style="margin:0;">Análisis del perfume</div>
+              <button id="closeAnalysisBtn" class="tool-btn secondary small" type="button">← Volver</button>
+            </div>
+
+            <div class="modal-section">
+              <div class="modal-section-title">Familias olfativas principales</div>
+              <div id="modalProfile" class="profile-row"></div>
+            </div>
+
+            <div class="modal-section">
+              <div class="modal-section-title">Top 5 familias (visual)</div>
+              <div id="modalTop5" class="top5-wrap"></div>
+            </div>
+
+            <div class="modal-section">
+              <div class="modal-section-title">Detalles técnicos (estimados)</div>
+              <div class="tech-grid">
+                <div class="tech-card">
+                  <div class="tech-title">Intensidad</div>
+                  <div class="tech-bar grey"><div id="techIntensity" class="tech-fill"></div></div>
+                  <div id="techIntensityLabel" class="tech-sub"></div>
+                </div>
+                <div class="tech-card">
+                  <div class="tech-title">Duración</div>
+                  <div class="tech-bar grey"><div id="techLongevity" class="tech-fill"></div></div>
+                  <div id="techLongevityLabel" class="tech-sub"></div>
+                </div>
+                <div class="tech-card">
+                  <div class="tech-title">Estela / Proyección</div>
+                  <div class="tech-bar grey"><div id="techSillage" class="tech-fill"></div></div>
+                  <div id="techSillageLabel" class="tech-sub"></div>
+                </div>
+                <div class="tech-card">
+                  <div class="tech-title">Género</div>
+                  <div class="gender-bar">
+                    <div class="gender-mid"></div>
+                    <div id="techGenderMarker" class="gender-marker" title="Posición"></div>
+                  </div>
+                  <div id="techGenderLabel" class="tech-sub"></div>
+                </div>
+              </div>
+
+              <div class="hint" style="margin-top:10px;">
+                Métricas heurísticas basadas en familias, capas (Salida/Corazón/Fondo) y proporciones.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function normalizeText(value) {
+        return (value ?? "")
+          .toString()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[\u0300-\u036f]/g, "");
+      }
+      function escapeHtml(str) {
+        return (str ?? "")
+          .toString()
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+      function escapeHtmlAttr(str) {
+        return escapeHtml(str).replace(/`/g, "&#096;");
+      }
+      function cryptoRandomId() {
+        if (window.crypto?.randomUUID) return crypto.randomUUID();
+        return `id_${Date.now()}_${Math.random().toString(16).slice(2)}`;
+      }
+      function clamp(n, min, max) {
+        const x = Number(n);
+        if (!Number.isFinite(x)) return min;
+        return Math.min(max, Math.max(min, x));
+      }
+      function round1(n) { return Math.round(Number(n) * 10) / 10; }
+
+      const ESSENCES_KEY = "essences";
+      const PERFUMES_KEY = "perfumes";
+
+      function loadEssences() {
+        try { return JSON.parse(localStorage.getItem(ESSENCES_KEY)) || []; }
+        catch { return []; }
+      }
+      function loadPerfumes() {
+        try { return JSON.parse(localStorage.getItem(PERFUMES_KEY)) || []; }
+        catch { return []; }
+      }
+      function savePerfumes(perfumes) {
+        localStorage.setItem(PERFUMES_KEY, JSON.stringify(perfumes));
+      }
+
+      const FAMILY_META = {
+        'Aromática': { bg: '#0F766E', fg: '#FFFFFF' },
+        'Amaderada': { bg: '#7C2D12', fg: '#FFFFFF' },
+        'Ambarada': { bg: '#D68F00', fg: '#111827' },
+        'Almizclada': { bg: '#E3E3E3', fg: '#000000' },
+        'Floral': { bg: '#EC4899', fg: '#FFFFFF' },
+        'Cuero': { bg: '#3F2A1D', fg: '#FFFFFF' },
+        'Oriental': { bg: '#2D0075', fg: '#FFFFFF' },
+        'Especiada': { bg: '#DC2626', fg: '#FFFFFF' },
+        'Balsámica': { bg: '#065F46', fg: '#FFFFFF' },
+        'Resinosa': { bg: '#92400E', fg: '#FFFFFF' },
+        'Frutal': { bg: '#FB7185', fg: '#111827' },
+        'Gourmand': { bg: '#6B21A8', fg: '#FFFFFF' },
+        'Herbal': { bg: '#16A34A', fg: '#FFFFFF' },
+        'Verde': { bg: '#96D99A', fg: '#111827' },
+        'Aldehídica': { bg: '#0EA5E9', fg: '#FFFFFF' },
+        'Animalic': { bg: '#A16207', fg: '#FFFFFF' },
+        'Acuática': { bg: '#0369A1', fg: '#FFFFFF' },
+        'Ozónica': { bg: '#E0F2FE', fg: '#0F172A' },
+        'Terrosa': { bg: '#78350F', fg: '#FFFFFF' },
+        'Empolvada': { bg: '#E9D5FF', fg: '#4C1D95' },
+        'Ahumada': { bg: '#374151', fg: '#FFFFFF' },
+        'Metálica': { bg: '#9CA3AF', fg: '#111827' },
+        'Licorosa': { bg: '#BE185D', fg: '#FFFFFF' },
+        'Lactónica': { bg: '#FEF3C7', fg: '#7C2D12' },
+        'Anisada': { bg: '#2DD4BF', fg: '#0F172A' },
+        'Cítrica': { bg: '#F7FF5C', fg: '#111827' },
+        'Dulce': { bg: '#E8D373', fg: '#7C2D12' },
+        'Mielada': { bg: '#FFD000', fg: '#FFFFFF' },
+      };
+
+      function getFamilyStyle(family) {
+        const meta = FAMILY_META[family] || { bg: "#EEE", fg: "#111" };
+        return `background:${meta.bg};color:${meta.fg};border:1px solid rgba(0,0,0,.08);`;
+      }
+
+      function noteWeight(notes) {
+        const s = new Set((notes ?? []).map(n => normalizeText(n)));
+        if (s.has("corazon") || s.has("corazón")) return 1.55;
+        if (s.has("fondo")) return 1.35;
+        if (s.has("salida")) return 1.2;
+        return 1.0;
+      }
+
+      function aliasFamily(fam) {
+        const f = (fam ?? "").toString().trim();
+        if (normalizeText(f) === "ambarada") return "Ambarada";
+        if (normalizeText(f) === "amber") return "Ambarada";
+        return f || "—";
+      }
+
+            /* ✅ scoring completo de familias + selección principal (2-3) + métricas técnicas */
+      function computePerfumeFamilyScoreTable(ingredientUsages, essencesById) {
+        const score = new Map();
+        const freq = new Map();
+        const present = new Set();
+
+        function addFamily(family, value) {
+          const fam = aliasFamily(family);
+          if (!fam || fam === "—") return;
+          score.set(fam, (score.get(fam) ?? 0) + value);
+          freq.set(fam, (freq.get(fam) ?? 0) + 1);
+          present.add(fam);
+        }
+
+        const usages = Array.isArray(ingredientUsages) ? ingredientUsages : [];
+        for (const u of usages) {
+          const ing = essencesById.get(u.id);
+          if (!ing) continue;
+
+          const pct = clamp(u.percent, 0, 100);
+          if (pct <= 0) continue;
+
+          const families = Array.isArray(ing.families) ? ing.families.filter(Boolean).map(aliasFamily) : [];
+          if (families.length === 0) continue;
+
+          const wNote = noteWeight(ing.notes);
+          const perFamily = (pct * wNote) / families.length;
+
+          for (const fam of families) addFamily(fam, perFamily);
+        }
+
+        function boost(family, factor) {
+          const f = aliasFamily(family);
+          if (!score.has(f)) return;
+          score.set(f, (score.get(f) ?? 0) * factor);
+        }
+
+        const has = (f) => present.has(aliasFamily(f));
+
+        // Reglas de acorde
+        if (has("Cítrica") && (has("Verde") || has("Herbal") || has("Aromática"))) {
+          boost("Cítrica", 1.06);
+          boost("Verde", 1.06);
+          boost("Aromática", 1.08);
+        }
+        if ((has("Amaderada") || has("Terrosa") || has("Verde")) && (has("Resinosa") || has("Balsámica"))) {
+          boost("Resinosa", 1.08);
+          boost("Balsámica", 1.06);
+          boost("Amaderada", 1.05);
+        }
+        if (has("Ambarada") && (has("Especiada") || has("Resinosa")) && (has("Dulce") || has("Gourmand") || has("Mielada"))) {
+          boost("Oriental", 1.15);
+          boost("Ambarada", 1.10);
+          boost("Especiada", 1.06);
+          boost("Gourmand", 1.06);
+        }
+        if (has("Floral") && has("Empolvada")) {
+          boost("Floral", 1.06);
+          boost("Empolvada", 1.10);
+        }
+        if (has("Almizclada") && (has("Empolvada") || has("Floral"))) {
+          boost("Almizclada", 1.10);
+        }
+
+        const rows = [...score.entries()].map(([family, sc]) => ({
+          family,
+          score: sc,
+          freq: freq.get(family) ?? 0,
+        }));
+
+        rows.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          if (b.freq !== a.freq) return b.freq - a.freq;
+          return normalizeText(a.family).localeCompare(normalizeText(b.family));
+        });
+
+        const total = rows.reduce((a, b) => a + b.score, 0);
+        return rows.map((r) => ({ ...r, pct: total > 0 ? (r.score / total) * 100 : 0 }));
+      }
+
+      function pickMainFamiliesFromScoreTable(scoreTable) {
+        const items = Array.isArray(scoreTable) ? scoreTable : [];
+        if (items.length === 0) return [];
+        const top1 = items[0].pct || 0;
+        const selected = [items[0].family];
+        if (items[1] && (items[1].pct || 0) >= top1 * 0.58) selected.push(items[1].family);
+        if (items[2] && (items[2].pct || 0) >= top1 * 0.72) selected.push(items[2].family);
+        return selected.slice(0, 3);
+      }
+
+      // Compat: mantiene el nombre original para el resto del código
+      function computePerfumeProfileFamiliesComplex(ingredientUsages, essencesById) {
+        return pickMainFamiliesFromScoreTable(computePerfumeFamilyScoreTable(ingredientUsages, essencesById));
+      }
+
+      function computeTechMetrics(ingredientUsages, essencesById) {
+        const usages = Array.isArray(ingredientUsages) ? ingredientUsages : [];
+        const familyTable = computePerfumeFamilyScoreTable(usages, essencesById);
+        const famPct = new Map(familyTable.map((r) => [r.family, r.pct]));
+
+        const FIX = {
+          "Amaderada": 0.75, "Resinosa": 0.82, "Balsámica": 0.78, "Ambarada": 0.72,
+          "Cuero": 0.80, "Almizclada": 0.85, "Gourmand": 0.60, "Terrosa": 0.70,
+          "Empolvada": 0.62, "Oriental": 0.68, "Especiada": 0.55, "Floral": 0.45,
+          "Frutal": 0.35, "Cítrica": 0.22, "Acuática": 0.28, "Ozónica": 0.25,
+          "Verde": 0.40, "Herbal": 0.42, "Aromática": 0.48, "Dulce": 0.40,
+          "Mielada": 0.55, "Aldehídica": 0.30, "Animalic": 0.78, "Ahumada": 0.72,
+          "Metálica": 0.35, "Licorosa": 0.58, "Lactónica": 0.52, "Anisada": 0.50,
+        };
+
+        const GENDER = {
+          "Floral": -0.85, "Empolvada": -0.55, "Frutal": -0.45, "Dulce": -0.40,
+          "Mielada": -0.35, "Gourmand": -0.20, "Cítrica": 0.00, "Acuática": 0.10,
+          "Ozónica": 0.10, "Verde": 0.00, "Herbal": 0.10, "Aromática": 0.15,
+          "Almizclada": 0.00, "Amaderada": 0.55, "Resinosa": 0.55, "Balsámica": 0.35,
+          "Ambarada": 0.25, "Especiada": 0.25, "Cuero": 0.85, "Terrosa": 0.45,
+          "Oriental": 0.15, "Ahumada": 0.65, "Animalic": 0.55,
+        };
+
+        function avgFix() {
+          let acc = 0, wsum = 0;
+          for (const [fam, pct] of famPct.entries()) {
+            const f = FIX[fam] ?? 0.45;
+            acc += f * pct;
+            wsum += pct;
+          }
+          return wsum > 0 ? acc / wsum : 0.45;
+        }
+
+        let topW = 0, heartW = 0, baseW = 0;
+        for (const u of usages) {
+          const ing = essencesById.get(u.id);
+          if (!ing) continue;
+          const pct = clamp(u.percent, 0, 100);
+          const s = new Set((ing.notes ?? []).map(n => normalizeText(n)));
+          if (s.has("salida")) topW += pct;
+          if (s.has("corazon") || s.has("corazón")) heartW += pct;
+          if (s.has("fondo")) baseW += pct;
+        }
+        const layerSum = topW + heartW + baseW;
+        const topR = layerSum > 0 ? topW / layerSum : 0.33;
+        const heartR = layerSum > 0 ? heartW / layerSum : 0.34;
+        const baseR = layerSum > 0 ? baseW / layerSum : 0.33;
+
+        const heavyFamilies = ["Resinosa","Balsámica","Amaderada","Ambarada","Cuero","Ahumada","Animalic","Especiada"];
+        const heavyPct = heavyFamilies.reduce((a, f) => a + (famPct.get(f) ?? 0), 0);
+
+        const intensity = clamp((heavyPct * 0.65) + (baseR * 100 * 0.25) + (heartR * 100 * 0.10), 0, 100);
+        const fix = avgFix();
+        const longevity = clamp((fix * 70) + (baseR * 25) + ((famPct.get("Almizclada") ?? 0) * 0.15), 0, 100);
+
+        const aromaticPct = (famPct.get("Aromática") ?? 0) + (famPct.get("Cítrica") ?? 0) + (famPct.get("Acuática") ?? 0) + (famPct.get("Ozónica") ?? 0);
+        const spicePct = (famPct.get("Especiada") ?? 0);
+        const sillage = clamp((topR * 55) + (aromaticPct * 0.35) + (spicePct * 0.25) + (intensity * 0.15) - (baseR * 20), 0, 100);
+
+        let gAcc = 0, gW = 0;
+        for (const [fam, pct] of famPct.entries()) {
+          const b = GENDER[fam] ?? 0;
+          gAcc += b * pct;
+          gW += pct;
+        }
+        const gBias = gW > 0 ? (gAcc / gW) : 0;
+        const genderPos = clamp(50 + (gBias * 45), 0, 100);
+
+        function band(v){
+          if (v < 25) return "Baja";
+          if (v < 50) return "Media-baja";
+          if (v < 70) return "Media";
+          if (v < 85) return "Media-alta";
+          return "Alta";
+        }
+        function genderLabel(pos){
+          if (pos < 35) return "Femenino (tendencia)";
+          if (pos < 45) return "Unisex → femenino";
+          if (pos <= 55) return "Unisex";
+          if (pos <= 65) return "Unisex → masculino";
+          return "Masculino (tendencia)";
+        }
+
+        return {
+          intensity: round1(intensity),
+          longevity: round1(longevity),
+          sillage: round1(sillage),
+          genderPos: round1(genderPos),
+          intensityLabel: band(intensity),
+          longevityLabel: band(longevity),
+          sillageLabel: band(sillage),
+          genderLabel: genderLabel(genderPos),
+          familyTable,
+        };
+      }
+
+      let essences = loadEssences();
+      let perfumes = loadPerfumes();
+
+      const selectedUsageById = new Map();
+
+      const perfumeNameInput = document.getElementById("perfumeName");
+      const ingredientSearch = document.getElementById("ingredientSearch");
+      const ingredientSuggest = document.getElementById("ingredientSuggest");
+      const selectedList = document.getElementById("selectedList");
+      const savePerfumeBtn = document.getElementById("savePerfumeBtn");
+      const normalizeBtn = document.getElementById("normalizeBtn");
+      const sumPill = document.getElementById("sumPill");
+
+      const perfumesGrid = document.getElementById("perfumesGrid");
+
+      const modalOverlay = document.getElementById("modalOverlay");
+      const modalClose = document.getElementById("modalClose");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalProfile = document.getElementById("modalProfile");
+      const modalTop5 = document.getElementById("modalTop5");
+      const techIntensity = document.getElementById("techIntensity");
+      const techLongevity = document.getElementById("techLongevity");
+      const techSillage = document.getElementById("techSillage");
+      const techGenderMarker = document.getElementById("techGenderMarker");
+      const techIntensityLabel = document.getElementById("techIntensityLabel");
+      const techLongevityLabel = document.getElementById("techLongevityLabel");
+      const techSillageLabel = document.getElementById("techSillageLabel");
+      const techGenderLabel = document.getElementById("techGenderLabel");
+      const modalMeta = document.getElementById("modalMeta");
+      const modalIngredients = document.getElementById("modalIngredients");
+      const modalMissingHint = document.getElementById("modalMissingHint");
+      const modalSumHint = document.getElementById("modalSumHint");
+
+      const modalIngredientSearch = document.getElementById("modalIngredientSearch");
+      const modalIngredientSuggest = document.getElementById("modalIngredientSuggest");
+      const modalNormalizeBtn = document.getElementById("modalNormalizeBtn");
+      const modalSaveBtn = document.getElementById("modalSaveBtn");
+
+      const openAnalysisBtn = document.getElementById("openAnalysisBtn");
+      const closeAnalysisBtn = document.getElementById("closeAnalysisBtn");
+      const modalMainPanel = document.getElementById("modalMainPanel");
+      const modalAnalysisPanel = document.getElementById("modalAnalysisPanel");
+
+      function showMainPanel() {
+        if (modalMainPanel) modalMainPanel.style.display = "block";
+        if (modalAnalysisPanel) modalAnalysisPanel.style.display = "none";
+      }
+
+      function showAnalysisPanel() {
+        if (modalMainPanel) modalMainPanel.style.display = "none";
+        if (modalAnalysisPanel) modalAnalysisPanel.style.display = "block";
+      }
+
+      if (openAnalysisBtn) openAnalysisBtn.addEventListener("click", showAnalysisPanel);
+      if (closeAnalysisBtn) closeAnalysisBtn.addEventListener("click", showMainPanel);
+
+      let modalPerfumeId = null;
+      let modalWorkingUsages = [];
+
+      function openSuggest(el) { el.classList.add("open"); }
+      function closeSuggest(el) { el.classList.remove("open"); }
+
+      function getStockTextClass(stock) {
+        if (stock === "low") return "stock-text-low";
+        if (stock === "out") return "stock-text-out";
+        return "stock-text-available";
+      }
+
+      function formatPlaceWithId(e) {
+        const place = (e?.place ?? "").toString().trim() || "—";
+        const localId = Number(e?.localId);
+        if (Number.isFinite(localId) && localId > 0) return `${place} (#${localId})`;
+        return place;
+      }
+
+      function essenceLabel(e) {
+        const idTxt = e.localId ? `#${e.localId}` : "";
+        const place = e.place ? ` • ${e.place}` : "";
+        return `${e.name} ${idTxt}${place}`.trim();
+      }
+
+      function getEssenceById(id) {
+        return essences.find((e) => e.id === id) || null;
+      }
+
+      function sumSelected() {
+        let sum = 0;
+        for (const u of selectedUsageById.values()) sum += clamp(u.percent, 0, 100);
+        return round1(sum);
+      }
+
+      function updateSumPill() {
+        const sum = sumSelected();
+        sumPill.textContent = `Total: ${sum}%`;
+        sumPill.classList.remove("sum-ok", "sum-bad");
+        if (Math.abs(sum - 100) <= 0.1) sumPill.classList.add("sum-ok");
+        else sumPill.classList.add("sum-bad");
+      }
+
+      function normalizeSelectedTo100() {
+        const items = [...selectedUsageById.values()];
+        const sum = items.reduce((a, b) => a + clamp(b.percent, 0, 100), 0);
+        if (sum <= 0) return;
+        for (const it of items) {
+          it.percent = round1((clamp(it.percent, 0, 100) / sum) * 100);
+          selectedUsageById.set(it.id, it);
+        }
+        const after = [...selectedUsageById.values()];
+        const s2 = after.reduce((a, b) => a + b.percent, 0);
+        if (after.length >= 2 && Math.abs(s2 - 100) <= 0.25) {
+          const diff = round1(100 - s2);
+          const last = after[after.length - 1];
+          last.percent = clamp(round1(last.percent + diff), 0, 100);
+          selectedUsageById.set(last.id, last);
+        }
+        renderSelectedList();
+      }
+
+      function renderSuggestMain() {
+        essences = loadEssences();
+        const q = normalizeText(ingredientSearch.value.trim());
+
+        let list = essences;
+        if (q) {
+          list = essences.filter((e) => {
+            const hay = `${e.name} ${e.place ?? ""} ${e.provider ?? ""}`.trim();
+            return normalizeText(hay).includes(q);
+          });
+        }
+
+        list = list.slice(0, 20);
+
+        if (list.length === 0) {
+          ingredientSuggest.innerHTML = `<div class="suggest-empty">Sin resultados</div>`;
+          return;
+        }
+
+        ingredientSuggest.innerHTML = list
+          .map((e) => {
+            const disabled = selectedUsageById.has(e.id);
+            const stockClass = getStockTextClass(e.stock);
+            return `
+              <div class="suggest-item" data-id="${escapeHtmlAttr(e.id)}" style="${disabled ? "opacity:.45;pointer-events:none;" : ""}">
+                <span class="${stockClass}">${escapeHtml(essenceLabel(e))}</span>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      ingredientSearch.addEventListener("focus", () => {
+        renderSuggestMain();
+        openSuggest(ingredientSuggest);
+      });
+
+      ingredientSearch.addEventListener("input", () => {
+        renderSuggestMain();
+        openSuggest(ingredientSuggest);
+      });
+
+      ingredientSuggest.addEventListener("click", (e) => {
+        const item = e.target.closest(".suggest-item");
+        if (!item) return;
+        const id = item.dataset.id;
+        if (!id) return;
+
+        selectedUsageById.set(id, { id, percent: 10 });
+
+        ingredientSearch.value = "";
+        closeSuggest(ingredientSuggest);
+        renderSelectedList();
+      });
+
+      function renderSelectedList() {
+        selectedList.innerHTML = "";
+        const items = [...selectedUsageById.values()];
+
+        if (items.length === 0) {
+          selectedList.innerHTML = `<div class="hint">No agregaste ingredientes todavía.</div>`;
+          updateSumPill();
+          return;
+        }
+
+        for (const u of items) {
+          const e = getEssenceById(u.id);
+          const name = e?.name ?? "Ingrediente eliminado";
+          const placeWithId = e ? formatPlaceWithId(e) : "—";
+          const stockClass = e ? getStockTextClass(e.stock) : "stock-text-available";
+
+          const card = document.createElement("div");
+          card.className = "sel-card";
+          card.dataset.id = u.id;
+
+          card.innerHTML = `
+            <div class="sel-top">
+              <div class="sel-title">
+                <div class="name ${stockClass}" title="${escapeHtmlAttr(name)}">${escapeHtml(name)}</div>
+                <div class="meta" title="${escapeHtmlAttr(placeWithId)}">${escapeHtml(placeWithId)}</div>
+              </div>
+
+              <div class="sel-actions">
+                <button class="icon-btn" data-action="remove" title="Quitar">×</button>
+              </div>
+            </div>
+
+            <div class="percent-row">
+              <span class="pct-label">%</span>
+              <input class="pct-input" data-action="pct-input" type="number" min="0" max="100" step="0.1" value="${escapeHtmlAttr(u.percent)}" />
+              <input class="pct-range" data-action="pct-range" type="range" min="0" max="100" step="0.1" value="${escapeHtmlAttr(u.percent)}" />
+            </div>
+          `;
+
+          selectedList.appendChild(card);
+        }
+
+        updateSumPill();
+      }
+
+      selectedList.addEventListener("input", (e) => {
+        const card = e.target.closest(".sel-card");
+        if (!card) return;
+        const id = card.dataset.id;
+        if (!id) return;
+
+        const item = selectedUsageById.get(id);
+        if (!item) return;
+
+        if (e.target.matches('[data-action="pct-input"]')) {
+          item.percent = clamp(e.target.value, 0, 100);
+          selectedUsageById.set(id, item);
+          const range = card.querySelector('[data-action="pct-range"]');
+          if (range) range.value = item.percent;
+          updateSumPill();
+        }
+
+        if (e.target.matches('[data-action="pct-range"]')) {
+          item.percent = clamp(e.target.value, 0, 100);
+          selectedUsageById.set(id, item);
+          const inp = card.querySelector('[data-action="pct-input"]');
+          if (inp) inp.value = item.percent;
+          updateSumPill();
+        }
+      });
+
+      selectedList.addEventListener("click", (e) => {
+        const card = e.target.closest(".sel-card");
+        if (!card) return;
+        const id = card.dataset.id;
+        if (!id) return;
+
+        const btn = e.target.closest('[data-action="remove"]');
+        if (!btn) return;
+
+        selectedUsageById.delete(id);
+        renderSelectedList();
+      });
+
+      normalizeBtn.addEventListener("click", normalizeSelectedTo100);
+
+      function migratePerfumeIfNeeded(p) {
+        if (Array.isArray(p.ingredientUsages)) return p;
+
+        const ids = Array.isArray(p.ingredientIds) ? p.ingredientIds : [];
+        if (ids.length === 0) {
+          p.ingredientUsages = [];
+          return p;
+        }
+        const each = round1(100 / ids.length);
+        p.ingredientUsages = ids.map((id, idx) => ({
+          id,
+          percent: idx === ids.length - 1 ? round1(100 - each * (ids.length - 1)) : each
+        }));
+        return p;
+      }
+
+      savePerfumeBtn.addEventListener("click", () => {
+        const name = perfumeNameInput.value.trim();
+        const usages = [...selectedUsageById.values()].map(u => ({ id: u.id, percent: round1(clamp(u.percent, 0, 100)) }));
+
+        if (!name) { alert("Escribí el nombre del perfume."); return; }
+        if (usages.length === 0) { alert("Agregá al menos 1 ingrediente."); return; }
+
+        const key = normalizeText(name);
+        const exists = perfumes.some((p) => normalizeText(p.name) === key);
+        if (exists) {
+          const ok = confirm("Ya existe un perfume con ese nombre. ¿Querés reemplazarlo?");
+          if (!ok) return;
+          perfumes = perfumes.filter((p) => normalizeText(p.name) !== key);
+        }
+
+        perfumes.push({
+          id: cryptoRandomId(),
+          name,
+          ingredientUsages: usages,
+          createdAt: new Date().toISOString(),
+        });
+
+        savePerfumeBtn.textContent = "Guardado ✅";
+        setTimeout(() => (savePerfumeBtn.textContent = "Guardar perfume"), 900);
+
+        savePerfumes(perfumes);
+
+        perfumeNameInput.value = "";
+        selectedUsageById.clear();
+        renderSelectedList();
+        renderPerfumesTable();
+      });
+
+      function renderPerfumesTable() {
+        perfumes = loadPerfumes().map(migratePerfumeIfNeeded);
+        savePerfumes(perfumes);
+
+        perfumes = [...perfumes].sort((a, b) =>
+          normalizeText(a.name).localeCompare(normalizeText(b.name))
+        );
+
+        perfumesGrid.innerHTML = "";
+
+        if (perfumes.length === 0) {
+          perfumesGrid.innerHTML =
+            `<tr><td colspan="3" style="color:#666;font-style:italic;">No hay perfumes guardados.</td></tr>`;
+          return;
+        }
+
+        for (const p of perfumes) {
+          const count = Array.isArray(p.ingredientUsages) ? p.ingredientUsages.length : (p.ingredientIds?.length ?? 0);
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td><span class="name-link" data-action="open" data-id="${escapeHtmlAttr(p.id)}">${escapeHtml(p.name)}</span></td>
+            <td>${count}</td>
+            <td>
+              <button class="tool-btn danger" data-action="delete" data-id="${escapeHtmlAttr(p.id)}" type="button">Eliminar</button>
+            </td>
+          `;
+          perfumesGrid.appendChild(tr);
+        }
+      }
+
+      perfumesGrid.addEventListener("click", (e) => {
+        const openEl = e.target.closest('[data-action="open"]');
+        if (openEl) {
+          const id = openEl.dataset.id;
+          if (id) openPerfumeModal(id);
+          return;
+        }
+
+        const delBtn = e.target.closest('button[data-action="delete"]');
+        if (delBtn) {
+          const id = delBtn.dataset.id;
+          if (!id) return;
+          const ok = confirm("¿Eliminar este perfume?");
+          if (!ok) return;
+          perfumes = loadPerfumes().filter((p) => p.id !== id);
+          savePerfumes(perfumes);
+          renderPerfumesTable();
+        }
+      });
+
+      function renderProfileBadges(families) {
+        modalProfile.innerHTML = "";
+        if (!families || families.length === 0) return;
+
+        for (const fam of families) {
+          const b = document.createElement("span");
+          b.className = "profile-badge";
+          b.style.cssText = getFamilyStyle(fam);
+          b.textContent = fam;
+          modalProfile.appendChild(b);
+        }
+      }
+
+      function renderTop5FamiliesVisual(familyTable) {
+        if (!modalTop5) return;
+        const table = Array.isArray(familyTable) ? familyTable : [];
+        const top = table.slice(0, 5);
+
+        modalTop5.innerHTML = "";
+        if (top.length === 0) {
+          modalTop5.innerHTML = `<div class="hint">Sin datos de familias.</div>`;
+          return;
+        }
+
+        const maxPct = Math.max(...top.map(t => t.pct || 0), 1);
+
+        for (const r of top) {
+          const wrap = document.createElement("div");
+          wrap.className = "top5-item";
+
+          const name = document.createElement("div");
+          name.className = "top5-name";
+          name.textContent = r.family;
+
+          const bar = document.createElement("div");
+          bar.className = "top5-bar";
+
+          const fill = document.createElement("div");
+          fill.className = "top5-fill";
+          fill.style.cssText = getFamilyStyle(r.family);
+          fill.style.width = `${clamp((r.pct / maxPct) * 100, 0, 100)}%`;
+
+          bar.appendChild(fill);
+          wrap.appendChild(name);
+          wrap.appendChild(bar);
+          modalTop5.appendChild(wrap);
+        }
+      }
+
+      function renderTechBars(tech) {
+        if (!tech) return;
+
+        if (techIntensity) techIntensity.style.width = `${clamp(tech.intensity, 0, 100)}%`;
+        if (techLongevity) techLongevity.style.width = `${clamp(tech.longevity, 0, 100)}%`;
+        if (techSillage) techSillage.style.width = `${clamp(tech.sillage, 0, 100)}%`;
+
+        if (techIntensityLabel) techIntensityLabel.textContent = tech.intensityLabel;
+        if (techLongevityLabel) techLongevityLabel.textContent = tech.longevityLabel;
+        if (techSillageLabel) techSillageLabel.textContent = tech.sillageLabel;
+
+        if (techGenderMarker) techGenderMarker.style.left = `${clamp(tech.genderPos, 0, 100)}%`;
+        if (techGenderLabel) techGenderLabel.textContent = tech.genderLabel;
+      }
+
+      function makePill(text) {
+        const s = document.createElement("span");
+        s.className = "pill";
+        s.textContent = text;
+        return s;
+      }
+
+      function modalSum(usages) {
+        return round1((usages ?? []).reduce((a, b) => a + clamp(b.percent, 0, 100), 0));
+      }
+
+      function renderModalSumHint() {
+        const s = modalSum(modalWorkingUsages);
+        if (Math.abs(s - 100) <= 0.1) {
+          modalSumHint.innerHTML = `<span style="color:#065F46;font-weight:800;">Total: ${s}% ✅</span>`;
+        } else {
+          modalSumHint.innerHTML = `<span style="color:#DC2626;font-weight:800;">Total: ${s}% (ideal 100%)</span>`;
+        }
+      }
+
+      function modalNormalizeTo100() {
+        const sum = (modalWorkingUsages ?? []).reduce((a, b) => a + clamp(b.percent, 0, 100), 0);
+        if (sum <= 0) return;
+        modalWorkingUsages = modalWorkingUsages.map((u) => ({
+          id: u.id,
+          percent: round1((clamp(u.percent, 0, 100) / sum) * 100),
+        }));
+        if (modalWorkingUsages.length >= 2) {
+          const s2 = modalSum(modalWorkingUsages);
+          if (Math.abs(s2 - 100) <= 0.25) {
+            const diff = round1(100 - s2);
+            const last = modalWorkingUsages[modalWorkingUsages.length - 1];
+            last.percent = clamp(round1(last.percent + diff), 0, 100);
+          }
+        }
+        renderModalIngredients();
+      }
+
+      function renderModalIngredients() {
+        essences = loadEssences();
+        const essencesById = new Map(essences.map(e => [e.id, e]));
+
+        modalIngredients.innerHTML = "";
+        modalMissingHint.style.display = "none";
+
+        let missing = 0;
+
+        for (const u of modalWorkingUsages || []) {
+          const e = essencesById.get(u.id) || null;
+          if (!e) missing += 1;
+
+          const name = e?.name ?? "Ingrediente eliminado";
+          const placeWithId = e ? formatPlaceWithId(e) : "—";
+          const stockClass = e ? getStockTextClass(e.stock) : "stock-text-available";
+          const pct = clamp(u.percent, 0, 100);
+
+          const tr = document.createElement("tr");
+          tr.dataset.id = u.id;
+          tr.innerHTML = `
+            <td class="${stockClass}">${escapeHtml(name)}</td>
+            <td title="${escapeHtmlAttr(placeWithId)}">${escapeHtml(placeWithId)}</td>
+            <td>
+              <div class="row-tight">
+                <input class="mini-input" data-action="pct-input" type="number" min="0" max="100" step="0.1" value="${escapeHtmlAttr(pct)}" />
+                <input class="mini-range" data-action="pct-range" type="range" min="0" max="100" step="0.1" value="${escapeHtmlAttr(pct)}" />
+              </div>
+            </td>
+            <td>
+              <button class="icon-btn" data-action="remove" title="Quitar">×</button>
+            </td>
+          `;
+          modalIngredients.appendChild(tr);
+        }
+
+        if (missing > 0) modalMissingHint.style.display = "block";
+
+        const tech = computeTechMetrics(modalWorkingUsages, essencesById);
+        renderProfileBadges(pickMainFamiliesFromScoreTable(tech.familyTable));
+        renderTop5FamiliesVisual(tech.familyTable);
+        renderTechBars(tech);
+
+        renderModalSumHint();
+      }
+
+      function openPerfumeModal(id) {
+        essences = loadEssences();
+        perfumes = loadPerfumes().map(migratePerfumeIfNeeded);
+        savePerfumes(perfumes);
+
+        const perfume = perfumes.find((p) => p.id === id);
+        if (!perfume) return;
+
+        modalPerfumeId = perfume.id;
+        modalTitle.textContent = perfume.name;
+
+        modalMeta.innerHTML = "";
+        modalMeta.appendChild(makePill(`Ingredientes: ${perfume.ingredientUsages?.length ?? 0}`));
+        modalMeta.appendChild(makePill(`Guardado: ${new Date(perfume.createdAt).toLocaleDateString()}`));
+
+        modalWorkingUsages = (perfume.ingredientUsages || []).map(u => ({ id: u.id, percent: round1(clamp(u.percent, 0, 100)) }));
+
+        modalIngredientSearch.value = "";
+        closeSuggest(modalIngredientSuggest);
+
+        renderModalIngredients();
+
+        modalOverlay.classList.add("open");
+        modalOverlay.setAttribute("aria-hidden", "false");
+        modalClose.focus();
+      }
+
+      function closeModal() {
+        showMainPanel();
+        modalOverlay.classList.remove("open");
+        modalOverlay.setAttribute("aria-hidden", "true");
+        modalPerfumeId = null;
+        modalWorkingUsages = [];
+      }
+
+      modalClose.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", (e) => {
+        if (e.target === modalOverlay) closeModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      modalIngredients.addEventListener("input", (e) => {
+        const tr = e.target.closest("tr");
+        if (!tr) return;
+        const id = tr.dataset.id;
+        if (!id) return;
+
+        const idx = (modalWorkingUsages || []).findIndex(u => u.id === id);
+        if (idx < 0) return;
+
+        if (e.target.matches('[data-action="pct-input"]')) {
+          const v = clamp(e.target.value, 0, 100);
+          modalWorkingUsages[idx].percent = v;
+          const range = tr.querySelector('[data-action="pct-range"]');
+          if (range) range.value = v;
+          renderModalSumHint();
+        }
+
+        if (e.target.matches('[data-action="pct-range"]')) {
+          const v = clamp(e.target.value, 0, 100);
+          modalWorkingUsages[idx].percent = v;
+          const inp = tr.querySelector('[data-action="pct-input"]');
+          if (inp) inp.value = v;
+          renderModalSumHint();
+        }
+
+        const essencesById = new Map(loadEssences().map(e2 => [e2.id, e2]));
+        const tech = computeTechMetrics(modalWorkingUsages, essencesById);
+        renderProfileBadges(pickMainFamiliesFromScoreTable(tech.familyTable));
+        renderTop5FamiliesVisual(tech.familyTable);
+        renderTechBars(tech);
+      });
+
+      modalIngredients.addEventListener("click", (e) => {
+        const tr = e.target.closest("tr");
+        if (!tr) return;
+        const id = tr.dataset.id;
+        if (!id) return;
+
+        const btn = e.target.closest('[data-action="remove"]');
+        if (!btn) return;
+
+        modalWorkingUsages = modalWorkingUsages.filter(u => u.id !== id);
+        renderModalIngredients();
+      });
+
+      modalNormalizeBtn.addEventListener("click", modalNormalizeTo100);
+
+      modalSaveBtn.addEventListener("click", () => {
+        if (!modalPerfumeId) return;
+
+        perfumes = loadPerfumes().map(migratePerfumeIfNeeded);
+
+        const idx = perfumes.findIndex(p => p.id === modalPerfumeId);
+        if (idx < 0) return;
+
+        perfumes[idx].ingredientUsages = (modalWorkingUsages || []).map(u => ({
+          id: u.id,
+          percent: round1(clamp(u.percent, 0, 100))
+        }));
+
+        savePerfumes(perfumes);
+        modalSaveBtn.textContent = "Guardado ✅";
+        setTimeout(() => (modalSaveBtn.textContent = "Guardar cambios"), 900);
+
+        renderPerfumesTable();
+
+        modalMeta.innerHTML = "";
+        modalMeta.appendChild(makePill(`Ingredientes: ${perfumes[idx].ingredientUsages?.length ?? 0}`));
+        modalMeta.appendChild(makePill(`Guardado: ${new Date(perfumes[idx].createdAt).toLocaleDateString()}`));
+      });
+
+      function renderSuggestModal() {
+        essences = loadEssences();
+        const q = normalizeText(modalIngredientSearch.value.trim());
+
+        let list = essences;
+        if (q) {
+          list = essences.filter((e) => {
+            const hay = `${e.name} ${e.place ?? ""} ${e.provider ?? ""}`.trim();
+            return normalizeText(hay).includes(q);
+          });
+        }
+
+        list = list.slice(0, 20);
+
+        if (list.length === 0) {
+          modalIngredientSuggest.innerHTML = `<div class="suggest-empty">Sin resultados</div>`;
+          return;
+        }
+
+        const current = new Set((modalWorkingUsages || []).map(u => u.id));
+
+        modalIngredientSuggest.innerHTML = list
+          .map((e) => {
+            const disabled = current.has(e.id);
+            const stockClass = getStockTextClass(e.stock);
+            return `
+              <div class="suggest-item" data-id="${escapeHtmlAttr(e.id)}" style="${disabled ? "opacity:.45;pointer-events:none;" : ""}">
+                <span class="${stockClass}">${escapeHtml(essenceLabel(e))}</span>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      modalIngredientSearch.addEventListener("focus", () => {
+        renderSuggestModal();
+        openSuggest(modalIngredientSuggest);
+      });
+
+      modalIngredientSearch.addEventListener("input", () => {
+        renderSuggestModal();
+        openSuggest(modalIngredientSuggest);
+      });
+
+      modalIngredientSuggest.addEventListener("click", (e) => {
+        const item = e.target.closest(".suggest-item");
+        if (!item) return;
+        const id = item.dataset.id;
+        if (!id) return;
+
+        modalWorkingUsages = [...modalWorkingUsages, { id, percent: 10 }];
+        modalIngredientSearch.value = "";
+        closeSuggest(modalIngredientSuggest);
+        renderModalIngredients();
+      });
+
+      document.addEventListener("click", (e) => {
+        const wrap1 = ingredientSearch.closest(".suggest-wrap");
+        if (wrap1 && !wrap1.contains(e.target)) closeSuggest(ingredientSuggest);
+
+        const wrap2 = modalIngredientSearch.closest(".suggest-wrap");
+        if (wrap2 && !wrap2.contains(e.target)) closeSuggest(modalIngredientSuggest);
+      });
+
+      const exportJsonBtn = document.getElementById("exportJsonBtn");
+      const importJsonInput = document.getElementById("importJsonInput");
+
+      function downloadFile(filename, text) {
+        const blob = new Blob([text], { type: "application/json;charset=utf-8" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      }
+
+      if (exportJsonBtn) {
+        exportJsonBtn.addEventListener("click", () => {
+          const payload = {
+            version: 1,
+            exportedAt: new Date().toISOString(),
+            essences: loadEssences(),
+            perfumes: loadPerfumes().map(migratePerfumeIfNeeded),
+          };
+          downloadFile("biblioteca_olfativa_export.json", JSON.stringify(payload, null, 2));
+        });
+      }
+
+      if (importJsonInput) {
+        importJsonInput.addEventListener("change", async (e) => {
+          const file = e.target.files && e.target.files[0];
+          if (!file) return;
+
+          try {
+            const text = await file.text();
+            const data = JSON.parse(text);
+
+            const nextEssences = Array.isArray(data?.essences) ? data.essences : null;
+            const nextPerfumes = Array.isArray(data?.perfumes) ? data.perfumes : null;
+
+            if (!nextEssences || !nextPerfumes) {
+              alert("El JSON no tiene el formato esperado (essences + perfumes).");
+              e.target.value = "";
+              return;
+            }
+
+            const ok = confirm("Esto reemplazará tu biblioteca y tus perfumes actuales. ¿Continuar?");
+            if (!ok) { e.target.value = ""; return; }
+
+            localStorage.setItem(ESSENCES_KEY, JSON.stringify(nextEssences));
+            localStorage.setItem(PERFUMES_KEY, JSON.stringify(nextPerfumes));
+
+            essences = loadEssences();
+            perfumes = loadPerfumes().map(migratePerfumeIfNeeded);
+            savePerfumes(perfumes);
+
+            selectedUsageById.clear();
+            renderSelectedList();
+            renderPerfumesTable();
+
+            alert("Importación completada ✅");
+          } catch (err) {
+            console.error(err);
+            alert("No se pudo importar el JSON (archivo inválido).");
+          } finally {
+            e.target.value = "";
+          }
+        });
+      }
+
+      window.addEventListener("DOMContentLoaded", () => {
+        renderSelectedList();
+        renderPerfumesTable();
+      });
+    </script>
+  </body>
+</html>
